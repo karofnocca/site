@@ -1,0 +1,21 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: 'Bicubik';
+  src: url('./assets/Bicubik.OTF') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Articulat CF Normal'; 
+  src: url('./assets/Articulat CF Normal.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+body {
+  font-family: 'Bicubik', sans-serif;
+  margin: 0;
+  overflow-x: hidden;
+}
