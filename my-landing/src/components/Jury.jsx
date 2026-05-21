@@ -3,20 +3,16 @@ import React from 'react';
 const Jury = () => {
   const experts = [
     {
-      name: "АЛЕКСАНДР МЕДВЕДЕВ",
-      desc: "экс-генконструктор Роскосмоса",
+      name: "НИКОЛАЙ МОРОЗОВ",
+      desc: "Арт-директор «Студии Артемия Лебедева»",
       img: "/1.png" // Замените на ваши пути к фото
     },
     {
-      name: "НИКОЛАЙ МОРОЗОВ",
-      desc: "арт-директор «Студии Артемия Лебедева»",
+      name: "Андрей Блохин",
+      desc: "Директор службы разработки перспективных инновационных проектов ГК ЭФКО",
       img: "/2.png"
     },
-    {
-      name: "АРТЕМ НИКОНОРОВ",
-      desc: "директор центра «Интеллектуальная мобильность»",
-      img: "/expert3.png"
-    }
+
   ];
 
   return (
@@ -30,7 +26,7 @@ const Jury = () => {
             Эксперты и жюри
           </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-20">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-20">
             {experts.map((expert, index) => (
               <div key={index} className="flex items-center gap-6">
                 {/* Круглое фото */}
@@ -39,7 +35,7 @@ const Jury = () => {
                     src={expert.img} 
                     alt={expert.name} 
                     className="w-full h-full object-cover"
-                    onError={(e) => { e.target.src = 'https://via.placeholder.com/150'; }} // Заглушка если фото нет
+                    // onError={(e) => { e.target.src = 'https://via.placeholder.com/150'; }} // Заглушка если фото нет
                   />
                 </div>
 
@@ -60,11 +56,6 @@ const Jury = () => {
       </div>
 
       {/* ТЕМНЫЙ БЛОК "СПРОЕКТИРУЙ БУДУЩЕЕ" */}
-      <div className="bg-[#2D2D2D] py-24 md:py-32 px-6">
-        <h2 className="font-['Bicubik'] text-white text-[22px] md:text-[60px] lg:text-[80px] text-center uppercase tracking-wider leading-none">
-          Спроектируй будущее
-        </h2>
-      </div>
 
     </section>
   );

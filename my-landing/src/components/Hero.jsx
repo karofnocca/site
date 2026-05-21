@@ -1,6 +1,14 @@
 import React from 'react';
 
 const Hero = () => {
+  // 1. ДОБАВЛЯЕМ ЭТУ ФУНКЦИЮ (Она должна быть внутри Hero)
+  const scrollToSection = (id) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <section className="w-full bg-white font-['Bicubik'] overflow-hidden selection:bg-black selection:text-white">
       
@@ -54,9 +62,9 @@ const Hero = () => {
         <div className="flex flex-col lg:contents relative z-30">
           
           {/* 4. СОБАКА */}
-          <div className="relative lg:absolute mt-[-60px] lg:mt-15 lg:top-[200px] left-[50%] lg:left-[73%] -translate-x-1/2 w-[90%] md:w-[70%] lg:w-[550px] z-30 pointer-events-none">
+          <div className="relative lg:absolute mt-[-60px] lg:mt-15 lg:top-[0px] left-[50%] lg:left-[75%] -translate-x-1/2 w-[90%] md:w-[70%] lg:w-[750px] z-30 pointer-events-none">
              <img 
-               src="/robot-dog-removebg-preview.png" 
+               src="/robot-dog.png" 
                alt="Robot Dog" 
                className="w-full h-auto object-contain drop-shadow-2xl" 
              />
@@ -92,17 +100,32 @@ const Hero = () => {
       {/* 7. КНОПКИ (По центру на мобилке, слева на десктопе) */}
       {/* 7. КНОПКИ (Выше и левее) */}
 <div className="max-w-[1440px] mx-auto px-8 lg:px-10 mt-20 lg:mt-40 relative z-40"> 
-  {/* mt-20 — отступ на мобилках, lg:mt-40 — на больших экранах */}
-  
-  <div className="flex flex-col lg:flex-row gap-5 lg:gap-8 lg:pl-14 justify-start items-center lg:items-start">
-    <button className="w-full font-bold font-['Articulat_CF_Normal'] lg:w-auto bg-[#2D2D2D] text-white px-12 py-5 rounded-[8px] lg:rounded-[4px] text-[18px] lg:text-[20px] uppercase transition-all duration-300 hover:bg-[#FF4F01] active:scale-95 shadow-md">
-      Участвовать
-    </button>
-    <button className="w-full font-bold font-['Articulat_CF_Normal'] lg:w-auto border-[2px] lg:border-[2.5px] border-black lg:border-[#2D2D2D] text-[#2D2D2D] px-10 py-5 rounded-[8px] lg:rounded-[4px] text-[18px] lg:text-[20px] uppercase bg-white transition-all duration-300 hover:bg-gray-100 active:scale-95">
-      Прийти на мероприятие
-    </button>
-  </div>
-</div>
+        <div className="flex flex-col lg:flex-row gap-5 lg:gap-8 lg:pl-14 justify-start items-center lg:items-start">
+          <button 
+            onClick={() => scrollToSection('upload-form')} // Ссылка на форму конкурса
+            className="w-full font-bold font-['Articulat_CF_Normal'] lg:w-auto bg-[#2D2D2D] text-white px-12 py-5 rounded-[8px] lg:rounded-[4px] text-[18px] lg:text-[20px] uppercase transition-all duration-300 hover:bg-[#FF4F01] active:scale-95 shadow-md"
+          >
+            Участвовать
+          </button>
+          <button 
+            onClick={() => scrollToSection('event-register')} // Ссылка на регистрацию
+            className="w-full font-bold font-['Articulat_CF_Normal'] lg:w-auto border-[2px] lg:border-[2.5px] border-black lg:border-[#2D2D2D] text-[#2D2D2D] px-10 py-5 rounded-[8px] lg:rounded-[4px] text-[18px] lg:text-[20px] uppercase bg-white transition-all duration-300 hover:bg-gray-100 active:scale-95"
+          >
+            Прийти на мероприятие
+          </button>
+        </div>
+
+        {/* НОВЫЙ ПАРАГРАФ ПОД КНОПКАМИ */}
+        <div className="mt-8 lg:pl-14 text-center lg:text-left">
+          <a 
+            // href="https://t.me/your_link" // Можно заменить на реальную ссылку или оставить так
+            target="_blank"
+            className="font-bold font-['Articulat_CF_Normal'] text-[18px] lg:text-[24px] text-black underline underline-offset-8 decoration-2 hover:text-[#FF4F01] transition-colors cursor-pointer"
+          >
+            Присоединяйся к команде будущего
+          </a>
+        </div>
+      </div>
 
       {/* 8. НИЖНЯЯ СТАТИСТИКА */}
       <div className="max-w-[1440px] font-['Bicubik']  mx-auto px-8 lg:px-10 py-12 lg:py-24 grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-12">
