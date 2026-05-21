@@ -118,7 +118,7 @@ const Hero = () => {
         {/* НОВЫЙ ПАРАГРАФ ПОД КНОПКАМИ */}
         <div className="mt-8 lg:pl-14 text-center lg:text-left">
           <a 
-            // href="https://t.me/your_link" // Можно заменить на реальную ссылку или оставить так
+            href="http://tb-drone.ru/" // Можно заменить на реальную ссылку или оставить так
             target="_blank"
             className="font-bold font-['Articulat_CF_Normal'] text-[18px] lg:text-[24px] text-black underline underline-offset-8 decoration-2 hover:text-[#FF4F01] transition-colors cursor-pointer"
           >
