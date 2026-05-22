@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 
-// Вставьте сюда актуальный URL вашего развернутого скрипта для таблицы "Конкурс"
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxDGeEc4UsTMquUFRh6OGK6fnHOA0RMgIm2m02pCDpCQR3uNO0wGZ2GqAzigk_ba7iL/exec'; 
 
 const UploadForm = () => {
   const fileInputRef = useRef(null);
+  const portfolioFileRef = useRef(null); // Реф для файла портфолио
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [alreadyExistsError, setAlreadyExistsError] = useState(false);
@@ -14,8 +14,9 @@ const UploadForm = () => {
     email: '',
     profession: '',
     experience: '',
-    portfolio: '',
-    fileName: ''
+    portfolio: '', // Здесь будет ссылка
+    fileName: '', // Основной файл проекта
+    portfolioFileName: '' // Файл портфолио
   });
 
   const [errors, setErrors] = useState({});
@@ -33,9 +34,12 @@ const UploadForm = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
-    if (errors[name]) {
+    
+    // Очистка ошибки при вводе
+    if (errors[name] || errors.portfolioGroup) {
       const newErrors = { ...errors };
       delete newErrors[name];
+      delete newErrors.portfolioGroup; // Убираем общую ошибку портфолио
       setErrors(newErrors);
     }
   };
@@ -45,6 +49,15 @@ const UploadForm = () => {
       setFormData({ ...formData, fileName: e.target.files[0].name });
       const newErrors = { ...errors };
       delete newErrors.fileName;
+      setErrors(newErrors);
+    }
+  };
+
+  const handlePortfolioFileChange = (e) => {
+    if (e.target.files.length > 0) {
+      setFormData({ ...formData, portfolioFileName: e.target.files[0].name });
+      const newErrors = { ...errors };
+      delete newErrors.portfolioGroup; // Очищаем ошибку, так как файл выбран
       setErrors(newErrors);
     }
   };
@@ -62,12 +75,15 @@ const UploadForm = () => {
     }
     if (!formData.profession.trim()) newErrors.profession = 'Укажите профессию';
     if (!formData.experience.trim()) newErrors.experience = 'Опишите опыт';
-    if (!formData.fileName) newErrors.fileName = 'Загрузите файл';
-    if (!formData.portfolio.trim()) {
-      newErrors.portfolio = 'Укажите ссылку на портфолио';
-    } else if (!urlPattern.test(formData.portfolio) && !formData.portfolio.toLowerCase().includes('.pdf')) {
+    if (!formData.fileName) newErrors.fileName = 'Загрузите файл проекта';
+    
+    // ВАЛИДАЦИЯ ПОРТФОЛИО (Либо ссылка, либо файл)
+    if (!formData.portfolio.trim() && !formData.portfolioFileName) {
+      newErrors.portfolioGroup = 'Укажите ссылку на портфолио или загрузите файл';
+    } else if (formData.portfolio.trim() && !urlPattern.test(formData.portfolio)) {
       newErrors.portfolio = 'Введите корректную ссылку';
     }
+
     if (!agreed) newErrors.agreed = 'Нужно согласие';
 
     setErrors(newErrors);
@@ -102,7 +118,6 @@ const UploadForm = () => {
     }
   };
 
-  // ЭКРАН УСПЕХА (Как во второй форме)
   if (isSubmitted) {
     return (
       <section className="w-full bg-white py-24 px-6 font-['Articulat_CF_Normal'] text-center animate-in fade-in zoom-in duration-500">
@@ -114,9 +129,6 @@ const UploadForm = () => {
           </div>
           <h2 className="font-['Bicubik'] text-[40px] md:text-[50px] uppercase mb-4 text-[#FF4F01] leading-none">Работа принята!</h2>
           <p className="text-xl text-[#2D2D2D] mb-6">Ваш проект успешно загружен. Мы свяжемся с вами после проверки всех работ.</p>
-          <p className="text-sm text-gray-500 italic border-t border-orange-200 pt-6">
-            Участие в конкурсе с одного Email возможно только один раз.
-          </p>
         </div>
       </section>
     );
@@ -137,42 +149,69 @@ const UploadForm = () => {
           
           <div className="flex flex-col">
             <label className="text-[18px] font-bold mb-2">Ваше имя</label>
-            <input name="name" value={formData.name} onChange={handleChange} type="text" className={`w-full h-14 border px-5 rounded-[8px] outline-none transition-all ${errors.name ? 'border-red-500 bg-red-50' : 'border-black focus:border-[#FF4F01]'}`} />
+            <input name="name" value={formData.name} onChange={handleChange} type="text" className={`w-full h-14 border px-5 rounded-[8px] outline-none border-black focus:border-[#FF4F01] ${errors.name && 'border-red-500 bg-red-50'}`} />
             <ErrorMsg name="name" />
           </div>
 
           <div className="flex flex-col">
             <label className="text-[18px] font-bold mb-2">Email</label>
-            <input name="email" value={formData.email} onChange={handleChange} type="email" className={`w-full h-14 border px-5 rounded-[8px] outline-none transition-all ${errors.email ? 'border-red-500 bg-red-50' : 'border-black focus:border-[#FF4F01]'}`} />
+            <input name="email" value={formData.email} onChange={handleChange} type="email" className={`w-full h-14 border px-5 rounded-[8px] outline-none border-black focus:border-[#FF4F01] ${errors.email && 'border-red-500 bg-red-50'}`} />
             <ErrorMsg name="email" />
             {alreadyExistsError && <span className="text-orange-600 text-[13px] mt-1 font-bold">Вы уже отправляли работу с этой почты</span>}
           </div>
 
-          <div className="flex flex-col">
-            <label className="text-[18px] font-bold mb-2">Профессия</label>
-            <input name="profession" value={formData.profession} onChange={handleChange} type="text" className={`w-full h-14 border px-5 rounded-[8px] border-black outline-none focus:border-[#FF4F01] ${errors.profession && 'border-red-500'}`} />
-            <ErrorMsg name="profession" />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="flex flex-col">
+                <label className="text-[18px] font-bold mb-2">Профессия</label>
+                <input name="profession" value={formData.profession} onChange={handleChange} type="text" className={`w-full h-14 border px-5 rounded-[8px] border-black outline-none focus:border-[#FF4F01] ${errors.profession && 'border-red-500'}`} />
+                <ErrorMsg name="profession" />
+            </div>
+            <div className="flex flex-col">
+                <label className="text-[18px] font-bold mb-2">Опыт работы</label>
+                <input name="experience" value={formData.experience} onChange={handleChange} type="text" className={`w-full h-14 border px-5 rounded-[8px] border-black outline-none focus:border-[#FF4F01] ${errors.experience && 'border-red-500'}`} />
+                <ErrorMsg name="experience" />
+            </div>
           </div>
 
+          {/* ОСНОВНОЙ ФАЙЛ ПРОЕКТА */}
           <div className="flex flex-col">
-            <label className="text-[18px] font-bold mb-2">Опыт работы</label>
-            <input name="experience" value={formData.experience} onChange={handleChange} type="text" className={`w-full h-14 border px-5 rounded-[8px] border-black outline-none focus:border-[#FF4F01] ${errors.experience && 'border-red-500'}`} />
-            <ErrorMsg name="experience" />
-          </div>
-
-          <div className="flex flex-col">
-            <label className="text-[18px] font-bold mb-2">Файл (png, jpg, pdf)</label>
+            <label className="text-[18px] font-bold mb-2">Файл с работой (png, jpg, pdf)</label>
             <div onClick={() => fileInputRef.current.click()} className={`w-full h-14 border px-5 flex items-center gap-3 cursor-pointer rounded-[8px] border-black hover:bg-gray-50 ${errors.fileName && 'border-red-500'}`}>
-              <span className="text-[16px] text-gray-500 truncate">{formData.fileName || 'Нажмите, чтобы выбрать'}</span>
+              <span className="text-[16px] text-gray-500 truncate">{formData.fileName || 'Нажмите, чтобы выбрать файл проекта'}</span>
               <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept=".png,.jpg,.pdf" />
             </div>
             <ErrorMsg name="fileName" />
           </div>
 
-          <div className="flex flex-col">
-            <label className="text-[18px] font-bold mb-2">Портфолио</label>
-            <input name="portfolio" value={formData.portfolio} onChange={handleChange} type="text" className={`w-full h-14 border px-5 rounded-[8px] border-black outline-none focus:border-[#FF4F01] ${errors.portfolio && 'border-red-500'}`} />
-            <ErrorMsg name="portfolio" />
+          {/* ПОРТФОЛИО: ССЫЛКА ИЛИ ФАЙЛ */}
+          <div className="flex flex-col space-y-4 p-5 bg-gray-50 rounded-xl border-l-4 border-[#FF4F01]">
+            <h3 className="text-[18px] font-bold">Портфолио (ссылка или файл)</h3>
+            
+            <div className="flex flex-col">
+                <input 
+                    name="portfolio" 
+                    placeholder="Вставьте ссылку на портфолио..."
+                    value={formData.portfolio} 
+                    onChange={handleChange} 
+                    type="text" 
+                    className={`w-full h-14 border px-5 rounded-[8px] border-black outline-none focus:border-[#FF4F01] ${errors.portfolio && 'border-red-500'}`} 
+                />
+                <ErrorMsg name="portfolio" />
+            </div>
+
+            <div className="flex items-center gap-4 text-gray-400">
+                <div className="h-[1px] bg-gray-300 flex-1"></div>
+                <span className="text-sm font-bold">ИЛИ</span>
+                <div className="h-[1px] bg-gray-300 flex-1"></div>
+            </div>
+
+            <div className="flex flex-col">
+                <div onClick={() => portfolioFileRef.current.click()} className={`w-full h-14 border px-5 flex items-center gap-3 cursor-pointer rounded-[8px] border-black bg-white hover:bg-gray-50 ${errors.portfolioGroup && 'border-red-500'}`}>
+                    <span className="text-[16px] text-gray-500 truncate">{formData.portfolioFileName || 'Загрузить файл портфолио'}</span>
+                    <input type="file" ref={portfolioFileRef} onChange={handlePortfolioFileChange} className="hidden" accept=".pdf,.doc,.docx,.png,.jpg" />
+                </div>
+            </div>
+            {errors.portfolioGroup && <span className="text-red-500 text-[13px] font-bold">{errors.portfolioGroup}</span>}
           </div>
 
           <div className="pt-6 flex flex-col items-center">

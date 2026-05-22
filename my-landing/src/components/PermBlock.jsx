@@ -44,7 +44,7 @@ const PermBlock = () => {
                 Жюри оценят работы: арт-директор «Студии Лебедева» Николай Морозов и эксперт Андрей Блохин.
               </p>
               
-              <p className="font-['Bicubik'] text-[24px] md:text-[32px] lg:text-[38px] pt-4 leading-none uppercase text-[#FFE600]">
+              <p className="font-['Bicubik'] text-[24px] md:text-[32px] lg:text-[38px] pt-4 leading-none uppercase text-[#ffffff]">
                 Сможет ли ИИ обойти человека?
               </p>
 
