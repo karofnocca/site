@@ -111,13 +111,13 @@ const Hero = () => {
         </div>
 
         <div className="mt-8 lg:pl-14 text-center lg:text-left">
-          <a 
-            href="http://tb-drone.ru/"
-            target="_blank"
-            className="font-bold font-['Articulat_CF_Normal'] text-[28px] lg:text-[24px] text-black underline underline-offset-8 decoration-2 hover:text-[#FF4F01] transition-colors cursor-pointer"
+          {/* ИЗМЕНЕНО: теперь это кнопка, которая скроллит к id="join-team" */}
+          <button 
+            onClick={() => scrollToSection('join-team')}
+            className="font-bold font-['Articulat_CF_Normal'] text-[28px] lg:text-[24px] text-black underline underline-offset-8 decoration-2 hover:text-[#FF4F01] transition-colors cursor-pointer bg-transparent border-none p-0"
           >
             Присоединяйся к команде будущего
-          </a>
+          </button>
         </div>
       </div>
 
