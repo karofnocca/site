@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 
-// Убедитесь, что этот URL ведет на развернутый скрипт нужной таблицы
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzkwXDY1YCng5ikvHqif80dJarkscpl1mbU7N1mTXOkIpAo-4vSOjP1WLmHcBIVP-R8/exec'; 
+// --- НАСТРОЙКИ TELEGRAM ---
+const TG_TOKEN = '8883123351:AAG3V13aULv0dCU0v30G9LgG8EjmKyLqzI4'; 
+const TG_CHAT_IDS = ['7052820465', '893865585']; 
 
 const EventRegister = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -11,12 +12,13 @@ const EventRegister = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    guests: ''
+    guests: '1'
   });
 
   const [errors, setErrors] = useState({});
   const [agreed, setAgreed] = useState(false);
 
+  // Проверка, не регистрировался ли уже пользователь (в этом браузере)
   useEffect(() => {
     const status = localStorage.getItem('eventRegistered');
     if (status) setIsSubmitted(true);
@@ -27,9 +29,7 @@ const EventRegister = () => {
     setFormData({ ...formData, [name]: value });
     setServerError('');
     if (errors[name]) {
-      const newErrors = { ...errors };
-      delete newErrors[name];
-      setErrors(newErrors);
+      setErrors({ ...errors, [name]: null });
     }
   };
 
@@ -38,14 +38,8 @@ const EventRegister = () => {
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     
     if (!formData.name.trim()) newErrors.name = 'Введите ваше имя';
-    if (!formData.email.trim()) {
-      newErrors.email = 'Введите Email';
-    } else if (!emailPattern.test(formData.email)) {
-      newErrors.email = 'Некорректный Email';
-    }
-    if (!formData.guests.trim()) {
-      newErrors.guests = 'Укажите число гостей';
-    }
+    if (!emailPattern.test(formData.email)) newErrors.email = 'Некорректный Email';
+    if (!formData.guests || formData.guests < 1) newErrors.guests = 'Укажите число гостей';
     if (!agreed) newErrors.agreed = 'Нужно ваше согласие';
 
     setErrors(newErrors);
@@ -56,6 +50,7 @@ const EventRegister = () => {
     e.preventDefault();
     if (!validate()) return;
 
+    // Проверка на дубликат почты в локальном хранилище
     const registeredEmails = JSON.parse(localStorage.getItem('registered_emails') || "[]");
     if (registeredEmails.includes(formData.email.toLowerCase().trim())) {
       setServerError('Вы уже зарегистрированы с этой почтой.');
@@ -64,23 +59,37 @@ const EventRegister = () => {
 
     setIsLoading(true);
     try {
-      await fetch(SCRIPT_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...formData,
-          "Дата": new Date().toLocaleString()
-        })
-      });
+      // ПОДГОТОВКА СООБЩЕНИЯ
+      const message = `
+🔔 <b>НОВАЯ РЕГИСТРАЦИЯ!</b>
+👤 <b>Имя:</b> ${formData.name}
+📧 <b>Email:</b> ${formData.email}
+👥 <b>Гостей:</b> ${formData.guests}
+📅 <b>Дата:</b> ${new Date().toLocaleString()}
+      `;
 
+      // ОТПРАВКА В TELEGRAM (цикл по всем ID)
+      for (const chatId of TG_CHAT_IDS) {
+        await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: chatId,
+            text: message,
+            parse_mode: 'HTML'
+          })
+        });
+      }
+
+      // Сохраняем данные об успешной регистрации
       const newEmails = [...registeredEmails, formData.email.toLowerCase().trim()];
       localStorage.setItem('registered_emails', JSON.stringify(newEmails));
       localStorage.setItem('eventRegistered', 'true');
+      
       setIsSubmitted(true);
     } catch (error) {
-      console.error('Ошибка:', error);
-      setServerError('Ошибка при отправке. Попробуйте позже.');
+      console.error('Ошибка отправки в ТГ:', error);
+      setServerError('Произошла ошибка. Попробуйте еще раз.');
     } finally {
       setIsLoading(false);
     }
@@ -88,22 +97,24 @@ const EventRegister = () => {
 
   if (isSubmitted) {
     return (
-      <section className="w-full bg-white py-24 px-6 font-['Articulat_CF_Normal'] text-center animate-in fade-in zoom-in duration-500">
-        <div className="max-w-[700px] mx-auto bg-[#FDF2ED] p-12 rounded-2xl border-2 border-[#FF4F01]/20">
+      <section className="w-full bg-white py-24 px-6 text-center animate-in fade-in zoom-in duration-500 font-sans">
+        <div className="max-w-[700px] mx-auto bg-[#FDF2ED] p-12 rounded-2xl border-2 border-[#FF4F01]/20 shadow-sm">
           <div className="w-20 h-20 bg-[#FF4F01] rounded-full flex items-center justify-center mx-auto mb-6">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3">
+                <polyline points="20 6 9 17 4 12" />
+            </svg>
           </div>
-          <h2 className="font-['Bicubik'] text-[40px] md:text-[50px] uppercase mb-4 text-[#FF4F01]">Вы записаны!</h2>
-          <p className="text-xl text-[#2D2D2D]">Данные успешно отправлены. Ждем вас на мероприятии!</p>
+          <h2 className="text-[40px] md:text-[50px] font-bold uppercase mb-4 text-[#FF4F01]">Вы записаны!</h2>
+          <p className="text-xl text-[#2D2D2D]">Ваши данные успешно отправлены. До встречи на мероприятии!</p>
         </div>
       </section>
     );
   }
 
   return (
-    <section id="event-register" className="w-full bg-white py-20 px-6 font-['Articulat_CF_Normal']">
+    <section id="event-register" className="w-full bg-white py-20 px-6 font-sans">
       <div className="max-w-[800px] mx-auto">
-        <h2 className="font-['Bicubik'] text-[40px] md:text-[60px] lg:text-[70px] leading-tight text-center uppercase mb-12 text-[#2D2D2D]">
+        <h2 className="text-[40px] md:text-[60px] font-bold text-center uppercase mb-12 text-[#2D2D2D] leading-tight">
           Регистрация <br /> на мероприятие
         </h2>
 
@@ -122,28 +133,20 @@ const EventRegister = () => {
 
           <div className="flex flex-col">
             <label className="text-[18px] font-bold mb-2">Количество гостей</label>
-            <input name="guests" type="number" min="1" placeholder="1" value={formData.guests} onChange={handleChange} className={`w-full h-14 border px-5 rounded-[8px] outline-none transition-all ${errors.guests ? 'border-red-500 bg-red-50' : 'border-black focus:border-[#FF4F01]'}`} />
+            <input name="guests" type="number" min="1" value={formData.guests} onChange={handleChange} className={`w-full h-14 border px-5 rounded-[8px] outline-none transition-all ${errors.guests ? 'border-red-500 bg-red-50' : 'border-black focus:border-[#FF4F01]'}`} />
             {errors.guests && <span className="text-red-500 text-[13px] mt-1 font-bold">{errors.guests}</span>}
           </div>
 
-          {/* ИСПРАВЛЕННЫЙ ЧЕКБОКС: Теперь кликабельный всегда */}
           <div className="pt-4 flex flex-col items-center">
             <label className="flex items-start gap-4 cursor-pointer max-w-fit">
               <input 
                 type="checkbox" 
                 checked={agreed} 
-                onChange={(e) => {
-                  setAgreed(e.target.checked);
-                  if (errors.agreed) {
-                    const n = {...errors};
-                    delete n.agreed;
-                    setErrors(n);
-                  }
-                }} 
+                onChange={(e) => setAgreed(e.target.checked)} 
                 className="w-7 h-7 accent-[#FF4F01] mt-1 flex-shrink-0 cursor-pointer" 
               />
               <span className={`text-[18px] md:text-[22px] leading-tight select-none ${errors.agreed ? 'text-red-500 font-bold' : 'text-gray-600'}`}>
-                Согласен на обработку персональных данных
+                Согласен на <a href="/dock.docx" onClick={(e) => e.stopPropagation()} target="_blank" className="underline hover:text-[#FF4F01]">обработку персональных данных</a>
               </span>
             </label>
             {errors.agreed && <span className="text-red-500 text-[13px] mt-2 font-bold">{errors.agreed}</span>}
@@ -153,7 +156,7 @@ const EventRegister = () => {
 
           <div className="flex justify-center pt-6">
             <button disabled={isLoading} type="submit" className="w-full md:w-[450px] bg-[#FF4F01] text-white py-5 px-10 rounded-[8px] text-[20px] font-bold uppercase transition-all hover:bg-[#E04500] disabled:bg-gray-400 active:scale-95 shadow-lg flex items-center justify-center gap-3">
-              {isLoading ? 'Загрузка...' : 'Зарегистрироваться'}
+              {isLoading ? 'Регистрация...' : 'Зарегистрироваться'}
             </button>
           </div>
         </form>

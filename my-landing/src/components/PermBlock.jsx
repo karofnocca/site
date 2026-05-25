@@ -5,10 +5,10 @@ const PermBlock = () => {
     <section className="w-full bg-white py-16 lg:py-24 px-6 overflow-hidden">
       <div className="max-w-[1440px] mx-auto flex flex-col lg:flex-row items-stretch gap-12 lg:gap-20">
         
-        {/* 1. ЛЕВАЯ ЧАСТЬ (Шильдик) */}
+        {/* 1. ЛЕВАЯ ЧАСТЬ (Шильдик) - ИСПРАВЛЕНО ОТОБРАЖЕНИЕ */}
         <div className="w-full lg:w-[30%] flex items-start"> 
-          <div className="w-full bg-white border-[3px] border-black p-8 md:p-12 text-center shadow-[10px_10px_0px_0px_rgba(0,0,0,0.05)]">
-            <div className="font-['Bicubik'] text-[24px] md:text-[34px] lg:text-[40px] leading-[1.1] text-[#2D2D2D] uppercase">
+          <div className="w-full bg-white border-[3px] border-black p-6 md:p-10 text-center shadow-[10px_10px_0px_0px_rgba(0,0,0,0.05)]">
+            <div className="font-['Bicubik'] text-[20px] md:text-[28px] lg:text-[32px] xl:text-[36px] leading-[1.2] text-[#2D2D2D] uppercase break-words">
               31.05.2026 <br />
               Г. ПЕРМЬ <br />
               «ПЕРМСКАЯ <br /> СИНЕМАТЕКА»
